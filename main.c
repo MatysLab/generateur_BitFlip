@@ -1,14 +1,24 @@
+/*****************************************************/
+//  Été 2025 INF-147
+//  Manipulation de bits sur 32 générateurs
+//  Contraintes : Maximum 2 contigues à 1
+/*****************************************************/
 
 #include "oper_bits.c"
 #include <assert.h>
 #include "gabarit.c"
 
+/*****************************************************/
+/*              CONSTANTES ET DÉFINITIONS            */
+/*****************************************************/
 
-#define TEST 0
+#define TEST_MODE 0
 
 #define N 32
 
-// Declaration des fonctions //
+/*****************************************************/
+/*         DÉCLARATIONS DES FONCTIONS UTILISÉES      */
+/*****************************************************/
 
 int isContigue(unsigned int etats_generateurr);
 unsigned int get_bits_dispo(unsigned int etat_bits);
@@ -20,14 +30,22 @@ void testIsContigue(void);
 void testGet_bits_dispo(void);
 void testChoix_alea_bit1(void);
 
+/*****************************************************/
+/*      FONCTIONS DE TRAITEMENT DES BITS             */
+/*****************************************************/
 
-//************************Definition des fonctions************************//
-int isContigue(unsigned int etats_generateurr)
+/*****************************************************/
+/*
+ Vérifie si trois bits consécutifs à 1 existent
+ PARAMÈTRE : etats_generateur - valeur sur 32 bits
+ RETOUR : 1 si trois bits consécutifs à 1 sont détectés, sinon 0
+ */
+int isContigue(unsigned int etats_generateur)
 {
     // Si un des generateurs est contigus, return index
     for (unsigned int index = 0, count = 0; index < 32; ++index)
     {
-        if (get_bit(etats_generateurr, index))
+        if (get_bit(etats_generateur, index))
             ++count;
         else
             count = 0;
@@ -38,7 +56,15 @@ int isContigue(unsigned int etats_generateurr)
     // Si aucun generateurs est contigus, return -1
     return 0;
 }
+/*****************************************************/
 
+/*****************************************************/
+/*
+ Retourne les positions disponibles (bits à 0) qui peuvent être mis à 1
+ sans créer 3 bits à 1 consécutifs.
+ PARAMÈTRE : unsigned int etat_bits (32 bits)
+ RETOUR : une valeur avec les positions valides à 1
+ */
 unsigned int get_bits_dispo(unsigned int etat_bits)
 {
     unsigned int bits_possibles = 0;
@@ -58,7 +84,15 @@ unsigned int get_bits_dispo(unsigned int etat_bits)
 
     return bits_possibles;
 }
+/*****************************************************/
 
+
+/*****************************************************/
+/*
+ Sélectionne un bit à 1 de manière aléatoire dans un nombre
+ PARAMÈTRE : unsigned int etat_bits (32 bits)
+ RETOUR : Index du bit sélectionné ou -1 si aucun disponible
+ */
 int choix_alea_bit1(unsigned int etat_bits)
 {
     if (!etat_bits)
@@ -72,7 +106,13 @@ int choix_alea_bit1(unsigned int etat_bits)
 
     return index;
 }
+/*****************************************************/
 
+/*****************************************************/
+/*
+ Initialise un générateur avec une configuration valide (pas de 3 bits à 1 consécutifs)
+ RETOUR : état initial du générateur
+ */
 unsigned int initGenerateur( void )
 {
     unsigned int config_initiale = 0;
@@ -94,7 +134,14 @@ unsigned int initGenerateur( void )
 
     return config_initiale;
 }
+/*****************************************************/
 
+/*****************************************************/
+/*
+ Permute un bit inactif (0 valide) avec un bit actif (1)
+ PARAMÈTRE : etat_gen_ions - état actuel
+ RETOUR : nouvel état après permutation
+ */
 unsigned int permuter_bits( unsigned int etat_gen_ions )
 {
     //Choisir un bit disponible 0
@@ -109,9 +156,12 @@ unsigned int permuter_bits( unsigned int etat_gen_ions )
 
     return etat_gen_ions;
 }
-//******************************|***********************************//
+/*****************************************************/
 
-//************************Test des fonctions************************//
+/*****************************************************/
+/*              FONCTIONS DE TEST                    */
+/*****************************************************/
+
 void testIsContigue(void)
 {
     // Test si aucun contigues
@@ -124,7 +174,7 @@ void testIsContigue(void)
 void testchoix_alea_bit1(void)
 {
     assert(choix_alea_bit1(0) == -1);
-    assert(choix_alea_bit1(0xFFFEFFFF) == 16);
+    assert(choix_alea_bit1(0xFFFEFFFF) == 17);
 }
 
 void testGet_bits_dispo(void)
@@ -132,11 +182,12 @@ void testGet_bits_dispo(void)
     unsigned int disposition = 9;
     assert( get_bits_dispo( disposition ) == ~disposition);
 }
-//******************************|***********************************//
+/*****************************************************/
 
-//********************Main code to test functions*******************//
-// Code just to test functions
-#if TEST == 1
+/*****************************************************/
+/*              MAIN POUR TESTS UNITAIRES            */
+/*****************************************************/
+#if TEST_MODE == 1
 int main(void)
 {
     srand_sys();
@@ -146,20 +197,19 @@ int main(void)
     return 0;
 }
 #endif
+/*****************************************************/
 
-//******************************|***********************************//
-
-
-//****************************Main Code*****************************//
-// Main code to be ran
-#if TEST == 0
+/*****************************************************/
+/*                 MAIN PRINCIPAL                    */
+/*****************************************************/
+#if TEST_MODE == 0
 int main(void)
 {
     srand_sys();
     // Etat des generateurs 32bits
     unsigned int etats_gen_ions = initGenerateur();
     
-    while (1)
+    for ( int i = 0; i < 5; ++i)
     {
         etats_gen_ions = permuter_bits( etats_gen_ions );
         voir_bits(etats_gen_ions);
@@ -167,4 +217,6 @@ int main(void)
     return 0;
 }
 #endif
-//******************************|***********************************//
+/*****************************************************/
+// FIN DU FICHIER
+/*****************************************************/
